@@ -107,39 +107,102 @@ $("#task-form-modal .btn-primary").click(function () {
       .closest(".list-group-item")
       .index();
 
-    
+
   });
 
   tasks[status][index].text = text;
 
-    saveTasks();
+  saveTasks();
 
-    var taskP = $("<p>")
+  var taskP = $("<p>")
     .addClass("m-1")
     .text(text);
 
-    $(this).replaceWith(taskP)
+  $(this).replaceWith(taskP)
 
 
-    $(".list-group").on("click", "span", function() {
-      // get current text
-      var date = $(this)
+  $(".list-group").on("click", "span", function () {
+    // get current text
+    var date = $(this)
+      .text()
+      .trim();
+
+    // create new input element
+    var dateInput = $("<input>")
+      .attr("type", "text")
+      .addClass("form-control")
+      .val(date);
+
+    // swap out elements
+    $(this).replaceWith(dateInput);
+
+    // automatically focus on new element
+    dateInput.trigger("focus");
+  });
+
+
+});
+
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function (event) {
+    console.log("activate", this);
+  },
+  deactivate: function (event) {
+    console.log("deactivate", this);
+  },
+  over: function (event) {
+    console.log("over", event.target);
+  },
+  out: function (event) {
+    console.log("out", event.target);
+  },
+  update: function (event) {
+    var tempArr = [];
+
+    $(this).children().each(function () {
+      var text = $(this)
+        .find("p")
         .text()
         .trim();
-    
-      // create new input element
-      var dateInput = $("<input>")
-        .attr("type", "text")
-        .addClass("form-control")
-        .val(date);
-    
-      // swap out elements
-      $(this).replaceWith(dateInput);
-    
-      // automatically focus on new element
-      dateInput.trigger("focus");
+
+      var date = $(this)
+        .find("span")
+        .text()
+        .trim();
+
+      tempArr.push({
+        text: text,
+        date: date
+      });
     });
+    var arrName = $(this)
+    .attr("id")
+    .replace("list-", "");
+
+    task[arrName] = tempArr;
+    saveTasks();
+  }
 });
+
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function(event, ui) {
+    ui.draggable.remove();
+    console.log("drop");
+  },
+  over: function(event, ui) {
+    console.log("over");
+  },
+  out: function(event, ui) {
+    console.log("out");
+  }
+});
+
 
 
 
